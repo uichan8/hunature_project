@@ -116,11 +116,6 @@ def main(args):
     width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    #if raspberry-pi is not working, use this to resize output window size.
-    #_, frame = cap.read()
-    #cv2.imshow("img", frame)
-    #cv2.waitKey(5000)
-
     #NCS2 setting
     ie = IECore()
     model      = ie.read_network(model= model_path+'.xml', weights = model_path+'.bin')
@@ -129,11 +124,12 @@ def main(args):
     output_key = list(network.outputs.keys())[0]
 
     #main code
-    tracker = BYTETracker(track_thresh, track_buffer, match_thresh,frame_rate = fps)
-    frame_id = 0
-    process_fps = 0
+    tracker      = BYTETracker(track_thresh, track_buffer, match_thresh,frame_rate = fps)
+    frame_id     = 0
+    process_fps  = 0
     appear_flags = {}
-    count = 0
+    count        = 0
+    
     while True:
         start = time()
         #read image from camera
@@ -187,24 +183,9 @@ def main(args):
                 online_ids.append(tid)
                 online_scores.append(t.score)
                 online_centroids.append(centroid)
-
-            # Count the objects
-            if is_in_line(centroid, line[0], margin=10):
-                if tid in appear_flags:
-                    if appear_flags[tid] == 2:
-                        count += 1
-                        del appear_flags[tid]
-                appear_flags[tid] = 1
-                    
-            if is_in_line(centroid, line[1], margin=10):
-                if tid in appear_flags:
-                    if appear_flags[tid] == 1:
-                        count += 1
-                        del appear_flags[tid]
-                appear_flags[tid] = 2
     
         #print_image
-        frame = plot_tracking(frame, online_tlwhs, online_ids, online_centroids, count, frame_id = frame_id + 1,fps = process_fps)
+        frame = plot_tracking(frame, online_tlwhs, fps = process_fps, count = , )
         cv2.line(frame, line[0][0], line[0][1], (0, 255, 0), 2)
         cv2.line(frame, line[1][0], line[1][1], (0, 255, 0), 2)
         cv2.imshow("img", frame)
