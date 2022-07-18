@@ -11,11 +11,12 @@ from DetectionTools.nms import multi_nms
 
 from TrackingTools.byte_tracker import BYTETracker
 
-from visualize import visualize, plot_tracking
+from Utils.visualize import visualize, plot_tracking
 
 def make_parser():
     parser = argparse.ArgumentParser("Counting algorithm")
     #path args
+
     parser.add_argument(
         "-m", "--model_path",
         type=str,
@@ -126,12 +127,11 @@ def main(args):
     #main code
     tracker      = BYTETracker(track_thresh, track_buffer, match_thresh,frame_rate = fps)
     frame_id     = 0
-    process_fps  = 0
-    appear_flags = {}
     count        = 0
+    start = time()
     
     while True:
-        start = time()
+        
         #read image from camera
         ret_val, frame = cap.read()
         if ret_val == False:
@@ -163,9 +163,10 @@ def main(args):
         #NMS
         tracking_result = multi_nms(boxes_xyxy, scores, nms_thr, score_thr)
 
-        # Define two lines for counting objects
-        line = [((0, int(0.2 * height)), (int(width), int(0.2 * height))),
-                    ((0, int(0.8 * height)), (int(width), int(0.8 * height)))]
+        #update fps
+        end = time()
+        fps = 1/(end - start)
+        start = time()
     
         #Update the tracklets
         online_targets = tracker.update(tracking_result[:, :-1], [height, width], [height, width])
@@ -183,11 +184,17 @@ def main(args):
                 online_ids.append(tid)
                 online_scores.append(t.score)
                 online_centroids.append(centroid)
-    
+        
+
+        #count
+        online_ids = np.array(online_ids)
+        if online_ids.shape[0] != 0 and count < online_ids.max():
+            count = online_ids.max()
+
+
+
         #print_image
-        frame = plot_tracking(frame, online_tlwhs, fps = process_fps, count = , )
-        cv2.line(frame, line[0][0], line[0][1], (0, 255, 0), 2)
-        cv2.line(frame, line[1][0], line[1][1], (0, 255, 0), 2)
+        frame = plot_tracking(frame, online_tlwhs, online_ids, online_centroids, count, fps)
         cv2.imshow("img", frame)
 
         if cv2.waitKey(1) == 27:
@@ -195,8 +202,7 @@ def main(args):
     
         #information update
         frame_id += 1
-        end = time()
-        process_fps = 1/(end-start)
+        
 
 if __name__ == '__main__':
     args = make_parser().parse_args()
