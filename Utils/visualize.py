@@ -41,9 +41,9 @@ def get_color(idx):
     return color
 
 
-def plot_tracking(image, tlwhs, obj_ids, centroids, count, fps, ids2=None):
-    im = np.ascontiguousarray(np.copy(image))
-
+def plot_tracking(im, tlwhs, obj_ids, centroids, count, fps, ids2=None):
+    #im = np.ascontiguousarray(np.copy(image))
+    
     #detection box and tracking ids
     for i, tlwh in enumerate(tlwhs):
         x1, y1, w, h = tlwh

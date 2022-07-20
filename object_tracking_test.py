@@ -1,5 +1,6 @@
+import os
 from openvino.inference_engine import IECore
-from time import time
+from time import time, sleep
 
 import argparse
 import cv2
@@ -119,31 +120,46 @@ def main(args):
     output_key = list(network.outputs.keys())[0]
 
     #main code
+    start = time()
     tracker      = BYTETracker(track_thresh, track_buffer, match_thresh,frame_rate = fps)
     frame_id     = 0
     count        = 0
-    start = time()
+
     
     while True:
         #read image from camera
+        s = time()
+
         ret_val, frame = cap.read()
         if ret_val == False:
             break
+
+        print(f"capture : {time()-s}")
+        s = time()
     
         #object detection part
         #process image
         img,ratio = preprocess(frame,input_shape)
         img = img[np.newaxis, ...]
+
+        print(f"preprocess : {time()-s}")
+        s = time()
     
         #inference
         output = network.infer(inputs={input_key: img})
         output = output[output_key]
+
+        print(f"infer : {time()-s}")
+        s = time()
 
         #demo processing
         predict = demo_process(output,input_shape)[0]
 
         boxes = predict[:, :4]
         scores = predict[:, 4:5] * predict[:, 5:8]
+
+        print(f"demo process : {time()-s}")
+        s = time()
     
         #xywh2xyxy
         boxes_xyxy = np.ones_like(boxes)
@@ -152,14 +168,21 @@ def main(args):
         boxes_xyxy[:, 2] = boxes[:, 0] + boxes[:, 2]/2.
         boxes_xyxy[:, 3] = boxes[:, 1] + boxes[:, 3]/2.
         boxes_xyxy /= ratio
+
+        print(f"change boxes : {time()-s}")
+        s = time()
     
         #NMS
         tracking_result = multi_nms(boxes_xyxy, scores, nms_thr, score_thr)
+
+        print(f"nms : {time()-s}")
+        s = time()
 
         #update fps
         end = time()
         fps = 1/(end - start)
         start = time()
+        print(fps)
     
         #Update the tracklets
         online_targets = tracker.update(tracking_result[:, :-1], [height, width], [height, width])
@@ -185,6 +208,8 @@ def main(args):
         if online_ids.shape[0] != 0 and count < online_ids.max():
             count = online_ids.max()
 
+        print(f"TRACK : {time()-s}")
+        s = time()
 
 
         #print_image
@@ -192,9 +217,17 @@ def main(args):
         cv2.imshow("img", frame)
         if cv2.waitKey(1) == 27:
             break
+
+        print(f"image print : {time()-s}")
+        s = time()
         
         #information update
         frame_id += 1
+
+        #clear terminal
+        
+        sleep(2)
+        os.system("clear")
 
 if __name__ == '__main__':
     args = make_parser().parse_args()
