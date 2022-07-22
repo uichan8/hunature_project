@@ -1,11 +1,9 @@
 # README.md
 
-# 소개
+# 요약
+다중 객체 추적(Multi Object Tracking, MOT)은 연속된 프레임 속에서 다중 객체에 대한 bounding box와 ID를 지속적으로 추적하는 것을 목표로 합니다. 대부분의 방법은 프레임의 번화에 따른 신뢰도(confidence score)가 임계값(threshold)보다 높게 검출된 객체의 bounding box를 연결하여 ID를 부여합니다. 다음 코드는 영상에서 객체를 추적하기 위해 ByteTrack 알고리즘을 이용합니다.
 
-다중 객체 추적(Multi Object Tracking, MOT)은 연속된 프레임 속에서 다중 객체에 대한 bounding box와 ID를 지속적으로 추적하는 것을 목표로 합니다. 대부분의 방법은 신뢰도(confidence score)가 임계값(threshold)보다 높게 검출된 객체의 bounding box를 연결하여 ID를 부여합니다.
-
-해당 시스템은 Raspberry Pi 4 Model B (RPi4B) 와 Intel Neural Compute Stick 2 (NCS2) 상에서 구동을 확인했습니다.
-추가적으로 NCS2를 활용하기 위한 OpenVINO toolkit 그리고 ByteTrack 알고리즘을 이용합니다.
+Raspberry Pi 4 Model B (RPi4B) 와 Intel Neural Compute Stick 2 (NCS2) 상에서 real-time으로 구동합니다. 
 
 ## YOLO X
 
@@ -154,44 +152,5 @@ mo --input_model <INPUT_MODEL_PATH>.onnx
 ```
 4. --model 에 IR 파일 경로를,  --input_shape 모델의 입력크기를 넣어줍니다.
   
-# runtime 매개변수
-## 파일경로 args
- --model:  
- IR(.bin, .xml) 모델의 path를 입력으로 넣어주세요.  
-   
- --video_path:  
- 비디오를 입력으로 넣고싶은 경우 경로를 입력합니다.
-   
- --output_dir:  
- 파일을 저장할 경로를 입력합니다.
- 
- ## object detection args  
- --input_shape:  
- IR 모델을 훈련 시켰을 때 입력 크기를 입력합니다.  
- 
- --score_thr:  
- model를 통과하고 나온 detection중 score_thr 보다 낮은 detection은 제거됩니다.  
-   
- --nms_thr:  
- non-maximal-suppression 의 threshold 입니다. 높을 수록 score가 높은 detection의 area와 IOU 가 높은 다른 detection을 많이 제거합니다.  
-   
- --with_p6:  
- FPN/PAN 에서 p6를 사용할지를 결정합니다. p6를 사용하게 되면 더 512^2의 anchor box를 사용하게 됩니다.  
-   
- ## object tracking args
- --track_thresh:  
- detection score에서 high, low를 나누는 threshold입니다.  
-   
- --track_buffer:  
- tracking에서 잃어버린 track들에 대해서 몇 frame까지 정보를 가지고 있을지 정합니다. 값이 클 수록 더 오랫동안 도중에 tracking이 끊긴 track들에 대해서 정보를 가지고 있습니다.  
-   
- --match_thresh:  
- 헝가리안 알고리즘(최적 비용 매칭)에서 IOU값으로 매칭 detection을 매칭시킬 때 사용하는 threshold값 입니다. 높을 수록 더 많이 매칭이 되지만 정확도가 떨어지게 됩니다.  
-   
- --min-box-area:  
- 매칭 된 detection 중 min-box-area보다 작은 detection에 대해서는 버려줍니다.  
-   
- --mot20:  
- mot20 challenge에 대해서 test할지 정합니다.  
  
 
