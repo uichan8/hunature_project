@@ -23,9 +23,12 @@ def preprocess(img, input_size):
         (int(img.shape[1] * r), int(img.shape[0] * r)),
         interpolation=cv2.INTER_LINEAR,
     ).astype(np.uint8)
-    padded_img[: int(img.shape[0] * r), : int(img.shape[1] * r)] = resized_img
 
+    padded_img[: int(img.shape[0] * r), : int(img.shape[1] * r)] = resized_img
     padded_img = padded_img[:, :, ::-1]
+    
+    #normalization
     padded_img = transforms(image=padded_img)['image'].transpose(swap)
+    #padded_img = ((padded_img - np.array([0.485, 0.456, 0.406]))/np.array([0.229, 0.224, 0.225])).transpose(swap)
 
     return padded_img, r

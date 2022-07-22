@@ -134,7 +134,7 @@ def main(args):
         if ret_val == False:
             break
 
-        print(f"capture : {time()-s}")
+        print(f"capture      : {int((time()-s)*1000)}")
         s = time()
     
         #object detection part
@@ -142,14 +142,14 @@ def main(args):
         img,ratio = preprocess(frame,input_shape)
         img = img[np.newaxis, ...]
 
-        print(f"preprocess : {time()-s}")
+        print(f"preprocess   : {int((time()-s)*1000)}")
         s = time()
     
         #inference
         output = network.infer(inputs={input_key: img})
         output = output[output_key]
 
-        print(f"infer : {time()-s}")
+        print(f"infer        : {int((time()-s)*1000)}")
         s = time()
 
         #demo processing
@@ -158,7 +158,7 @@ def main(args):
         boxes = predict[:, :4]
         scores = predict[:, 4:5] * predict[:, 5:8]
 
-        print(f"demo process : {time()-s}")
+        print(f"demo process : {int((time()-s)*1000)}")
         s = time()
     
         #xywh2xyxy
@@ -169,20 +169,19 @@ def main(args):
         boxes_xyxy[:, 3] = boxes[:, 1] + boxes[:, 3]/2.
         boxes_xyxy /= ratio
 
-        print(f"change boxes : {time()-s}")
+        print(f"change boxes : {int((time()-s)*1000)}")
         s = time()
     
         #NMS
         tracking_result = multi_nms(boxes_xyxy, scores, nms_thr, score_thr)
 
-        print(f"nms : {time()-s}")
+        print(f"nms          : {int((time()-s)*1000)}")
         s = time()
 
         #update fps
         end = time()
         fps = 1/(end - start)
         start = time()
-        print(fps)
     
         #Update the tracklets
         online_targets = tracker.update(tracking_result[:, :-1], [height, width], [height, width])
@@ -201,14 +200,12 @@ def main(args):
                 online_scores.append(t.score)
                 online_centroids.append(centroid)
         
-        
-
         #count
         online_ids = np.array(online_ids)
         if online_ids.shape[0] != 0 and count < online_ids.max():
             count = online_ids.max()
 
-        print(f"TRACK : {time()-s}")
+        print(f"TRACK        : {int((time()-s)*1000)}")
         s = time()
 
 
@@ -218,7 +215,7 @@ def main(args):
         if cv2.waitKey(1) == 27:
             break
 
-        print(f"image print : {time()-s}")
+        print(f"image print  : {int((time()-s)*1000)}")
         s = time()
         
         #information update
@@ -226,7 +223,7 @@ def main(args):
 
         #clear terminal
         
-        sleep(2)
+        sleep(4)
         os.system("clear")
 
 if __name__ == '__main__':
