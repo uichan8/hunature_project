@@ -11,3 +11,4 @@ lap
 motmetrics
 filterpy
 h5py
+albumentations
