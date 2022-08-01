@@ -1,3 +1,6 @@
-
+#for raspberry-pi
 __pycache__
 .pcy
+
+#for mac
+.DS_Store
