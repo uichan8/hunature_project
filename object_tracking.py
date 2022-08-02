@@ -13,6 +13,8 @@ from TrackingTools.byte_tracker import BYTETracker
 
 from Utils.visualize import visualize, plot_tracking
 
+#python3 object_tracking.py -i 224 -m 'DetectionModels/yolov5_nano/v5n'
+
 def make_parser():
     parser = argparse.ArgumentParser("Counting algorithm")
     #path args
@@ -50,8 +52,8 @@ def make_parser():
     )
     parser.add_argument(
         "-i", "--input_shape",
-        type=tuple,
-        default=(416,416),
+        type=int,
+        default=416,
         help="Specify an input shape for inference."
     )
     #tracker args
@@ -95,7 +97,7 @@ def main(args):
 
     #detection args
     classes     = ["person", "bicycle", "car"]
-    input_shape = args.input_shape
+    input_shape = (args.input_shape,args.input_shape)
     score_thr   = args.score_thr
     nms_thr     = args.nms_thr
 
@@ -132,7 +134,7 @@ def main(args):
     
         #object detection part
         #process image
-        img,ratio = preprocess(frame,input_shape)
+        img,ratio = preprocess(frame,input_shape,yolo_v5 = True)
         img = img[np.newaxis, ...]
     
         #inference
@@ -140,7 +142,9 @@ def main(args):
         output = output[output_key]
 
         #demo processing
-        predict = demo_process(output,input_shape)[0]
+        #predict = demo_process(output,input_shape)[0]
+        predict = output.reshape(-1,85)
+        print(output.shape)
 
         boxes = predict[:, :4]
         scores = predict[:, 4:5] * predict[:, 5:8]

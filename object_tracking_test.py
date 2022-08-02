@@ -153,8 +153,9 @@ def main(args):
         s = time()
 
         #demo processing
+        print(output.shape)
         predict = demo_process(output,input_shape)[0]
-
+        print(predict.shape)
         boxes = predict[:, :4]
         scores = predict[:, 4:5] * predict[:, 5:8]
 
