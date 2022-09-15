@@ -14,10 +14,11 @@ from TrackingTools.byte_tracker import BYTETracker
 
 from Utils.visualize import visualize, plot_tracking
 
+#python3 object_tracking_test.py -i 640 -m 'DetectionModels/yolov5s/yolov5s'
+
 def make_parser():
     parser = argparse.ArgumentParser("Counting algorithm")
     #path args
-
     parser.add_argument(
         "-m", "--model_path",
         type=str,
@@ -51,8 +52,8 @@ def make_parser():
     )
     parser.add_argument(
         "-i", "--input_shape",
-        type=tuple,
-        default=(416,416),
+        type=int,
+        default=416,
         help="Specify an input shape for inference."
     )
     #tracker args
@@ -86,6 +87,7 @@ def make_parser():
         default=10, 
         help='filter out tiny boxes'
     )
+
     return parser
 
 def main(args):
@@ -96,7 +98,7 @@ def main(args):
 
     #detection args
     classes     = ["person", "bicycle", "car"]
-    input_shape = args.input_shape
+    input_shape = (args.input_shape,args.input_shape)
     score_thr   = args.score_thr
     nms_thr     = args.nms_thr
 
@@ -139,7 +141,7 @@ def main(args):
     
         #object detection part
         #process image
-        img,ratio = preprocess(frame,input_shape)
+        img,ratio = preprocess(frame,input_shape,yolo_v5 = True)
         img = img[np.newaxis, ...]
 
         print(f"preprocess   : {int((time()-s)*1000)}")
@@ -153,9 +155,9 @@ def main(args):
         s = time()
 
         #demo processing
-        print(output.shape)
-        predict = demo_process(output,input_shape)[0]
-        print(predict.shape)
+        #predict = demo_process(output,input_shape)[0]
+        predict = output.reshape(-1,8)
+
         boxes = predict[:, :4]
         scores = predict[:, 4:5] * predict[:, 5:8]
 

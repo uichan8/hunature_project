@@ -13,7 +13,7 @@ from TrackingTools.byte_tracker import BYTETracker
 
 from Utils.visualize import visualize, plot_tracking
 
-#python3 object_tracking.py -i 224 -m 'DetectionModels/yolov5_nano/v5n'
+#python3 object_tracking.py -i 640 -m 'DetectionModels/model/model' -s 0.1
 
 def make_parser():
     parser = argparse.ArgumentParser("Counting algorithm")
@@ -41,13 +41,13 @@ def make_parser():
     parser.add_argument(
         "-s", "--score_thr",
         type=float,
-        default=0.5,
+        default=0.3,
         help="Score threshold to filter the result."
     )
     parser.add_argument(
         "-n", "--nms_thr",
         type=float,
-        default=0.7,
+        default=0.6,
         help="NMS threshold."
     )
     parser.add_argument(
@@ -143,8 +143,7 @@ def main(args):
 
         #demo processing
         #predict = demo_process(output,input_shape)[0]
-        predict = output.reshape(-1,85)
-        print(output.shape)
+        predict = output.reshape(-1,8)
 
         boxes = predict[:, :4]
         scores = predict[:, 4:5] * predict[:, 5:8]
