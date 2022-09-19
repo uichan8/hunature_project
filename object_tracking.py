@@ -118,12 +118,14 @@ def main(args):
     cap    = cv2.VideoCapture(video_path)
     width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    out = cv2.VideoWriter(saving_path, cv2.VideoWriter_fourcc(*'DIVX'), 30, (width, height))
+    if saving_path != None:
+        out = cv2.VideoWriter(saving_path, cv2.VideoWriter_fourcc(*'DIVX'), 30, (width, height))
 
     #NCS2 setting
     ie = IECore()
     model      = ie.read_network(model= model_path+'.xml', weights = model_path+'.bin')
-    network    = ie.load_network(network=model, device_name='MYRIAD')
+    #network    = ie.load_network(network=model, device_name='MYRIAD')
+    network    = ie.load_network(network=model, device_name='CPU')
     input_key  = list(network.input_info)[0]
     output_key = list(network.outputs.keys())[0]
 
@@ -205,7 +207,9 @@ def main(args):
         
         #information update
         frame_id += 1
-    out.release()
+        
+    if saving_path != None:
+        out.release()
 
 if __name__ == '__main__':
     args = make_parser().parse_args()

@@ -11,10 +11,7 @@
             "program": "object_tracking.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": [
-                "-m","DetectionModels/yolov5n_244/yolov5n_244",
-                "-i","224"
-            ]
+            "args": ["-m","DetectionModels/yolov5n_244/yolov5n_244","-i","224"]
         }
     ]
 }
