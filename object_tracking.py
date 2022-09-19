@@ -19,6 +19,12 @@ def make_parser():
     parser = argparse.ArgumentParser("Counting algorithm")
     #setting args
     parser.add_argument(
+        "-d", "--device",
+        type=str,
+        default="MYRAID",
+        help="CPU or MYRAID(ncs2)"
+    )
+    parser.add_argument(
         "-m", "--model_path",
         type=str,
         default="DetectionModels/yolox_tiny/yolox_tiny",
@@ -96,7 +102,8 @@ def make_parser():
     return parser
 
 def main(args):
-    #PATH args
+    #env args
+    device      = args.device 
     model_path  = args.model_path
     video_path  = 0 if args.video_path == '0' else args.video_path
     saving_path = args.output_path
@@ -124,8 +131,7 @@ def main(args):
     #NCS2 setting
     ie = IECore()
     model      = ie.read_network(model= model_path+'.xml', weights = model_path+'.bin')
-    #network    = ie.load_network(network=model, device_name='MYRIAD')
-    network    = ie.load_network(network=model, device_name='CPU')
+    network    = ie.load_network(network=model, device_name=device)
     input_key  = list(network.input_info)[0]
     output_key = list(network.outputs.keys())[0]
 
