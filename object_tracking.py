@@ -17,44 +17,50 @@ from Utils.visualize import visualize, plot_tracking
 
 def make_parser():
     parser = argparse.ArgumentParser("Counting algorithm")
-    #path args
-
+    #setting args
     parser.add_argument(
         "-m", "--model_path",
         type=str,
         default="DetectionModels/yolox_tiny/yolox_tiny",
-        help="Input your onnx model path without 확장자."
+        help="모델의 확장자를 제외한 경로를 입력해주세요."
     )
     parser.add_argument(
         "-v","--video_path",
         type=str,
         default='0',
-        help="Input your video path."
+        help="비디오를 입력으로 넣고싶은 경우 경로를 입력해 주세요, 입력안하면 카메라 정보가 입력으로 들어갑니다."
     )
     parser.add_argument(
         "-o", "--output_path",
         type=str,
-        default='0',
-        help="Path to your output directory."
+        default=None,
+        help="저장을 원하면 경로를 입력해주세요"
     )
+
     #detection args
     parser.add_argument(
         "-s", "--score_thr",
         type=float,
         default=0.3,
-        help="Score threshold to filter the result."
+        help="detection 에서 confidence_score의 입계값을 입력해 주세요"
     )
     parser.add_argument(
         "-n", "--nms_thr",
         type=float,
-        default=0.6,
-        help="NMS threshold."
+        default=0.5,
+        help="NMS 임계값을 입력해 주세요"
     )
     parser.add_argument(
         "-i", "--input_shape",
         type=int,
-        default=416,
-        help="Specify an input shape for inference."
+        default=0,
+        help="이미지 입력 사이즈를 입력해주세요"
+    )
+    parser.add_argument(
+        "-c", "--class_num",
+        type=int,
+        default=8,
+        help="클래스 수를 입력해 주세요"
     )
     #tracker args
     parser.add_argument(
@@ -73,7 +79,7 @@ def make_parser():
         "--fps",
         type=int,
         default=30, 
-        help="video fps"
+        help="video fps를 입력해주세요"
     )
     parser.add_argument(
         "--track_buffer", 
@@ -96,10 +102,10 @@ def main(args):
     saving_path = args.output_path
 
     #detection args
-    classes     = ["person", "bicycle", "car"]
     input_shape = (args.input_shape,args.input_shape)
     score_thr   = args.score_thr
     nms_thr     = args.nms_thr
+    class_num   = args.class_num
 
     #tracking args
     fps = args.fps
@@ -112,6 +118,7 @@ def main(args):
     cap    = cv2.VideoCapture(video_path)
     width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    out = cv2.VideoWriter(saving_path, cv2.VideoWriter_fourcc(*'DIVX'), 30, (width, height))
 
     #NCS2 setting
     ie = IECore()
@@ -142,8 +149,7 @@ def main(args):
         output = output[output_key]
 
         #demo processing
-        #predict = demo_process(output,input_shape)[0]
-        predict = output.reshape(-1,8)
+        predict = output.reshape(-1,class_num + 5)
 
         boxes = predict[:, :4]
         scores = predict[:, 4:5] * predict[:, 5:8]
@@ -181,23 +187,25 @@ def main(args):
                 online_scores.append(t.score)
                 online_centroids.append(centroid)
         
-        
-
         #count
         online_ids = np.array(online_ids)
         if online_ids.shape[0] != 0 and count < online_ids.max():
             count = online_ids.max()
-
-
 
         #print_image
         frame = plot_tracking(frame, online_tlwhs, online_ids, online_centroids, count, fps)
         cv2.imshow("img", frame)
         if cv2.waitKey(1) == 27:
             break
+
+        #save_video
+        if saving_path != None:
+            out.write(frame)
+
         
         #information update
         frame_id += 1
+    out.release()
 
 if __name__ == '__main__':
     args = make_parser().parse_args()
