@@ -13,7 +13,7 @@ from TrackingTools.byte_tracker import BYTETracker
 
 from Utils.visualize import visualize, plot_tracking
 
-#python3 object_tracking.py -i 640 -m 'DetectionModels/model/model' -s 0.1
+#python3 object_tracking.py -i 224 -m 'DetectionModels/yolov5n_224/yolov5n_224'
 
 def make_parser():
     parser = argparse.ArgumentParser("Counting algorithm")
@@ -21,7 +21,7 @@ def make_parser():
     parser.add_argument(
         "-d", "--device",
         type=str,
-        default="MYRAID",
+        default="MYRIAD",
         help="CPU or MYRAID(ncs2)"
     )
     parser.add_argument(
@@ -127,14 +127,14 @@ def main(args):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     if saving_path != None:
         out = cv2.VideoWriter(saving_path, cv2.VideoWriter_fourcc(*'DIVX'), 30, (width, height))
-
+    
     #NCS2 setting
     ie = IECore()
     model      = ie.read_network(model= model_path+'.xml', weights = model_path+'.bin')
     network    = ie.load_network(network=model, device_name=device)
     input_key  = list(network.input_info)[0]
     output_key = list(network.outputs.keys())[0]
-
+    
     #main code
     tracker      = BYTETracker(track_thresh, track_buffer, match_thresh,frame_rate = fps)
     frame_id     = 0

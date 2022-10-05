@@ -11,7 +11,7 @@
             "program": "object_tracking.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["-m","DetectionModels/yolov5s_640/yolov5s_640","-i","640","-d","CPU","-v","20211218080001-R__1799.mp4","-o","out.mp4"]
+            "args": ["-m","DetectionModels/yolov5s_244/yolov5s_244","-i","224","-d","MYRIAD"]
         }
     ]
 }
