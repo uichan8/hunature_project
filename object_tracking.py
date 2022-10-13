@@ -13,7 +13,12 @@ from TrackingTools.byte_tracker import BYTETracker
 
 from Utils.visualize import visualize, plot_tracking
 
-#python3 object_tracking.py -i 360 -m 'DetectionModels/yolov5n_320/yolov5n_320' -v 'station.mpg -o 'result'
+# USAGE
+# from camera
+# $ python3 object_tracking.py -i 320 -m 'DetectionModels/yolov5s_320/yolov5s_320'
+#
+# from video
+# $ python3 object_tracking.py -i 640 -m 'DetectionModels/yolov5s_640/yolov5s_640' -v "station.mpg" -o "result/station.mpg" --video_sampling "1" --fps "30"
 
 def make_parser():
     parser = argparse.ArgumentParser("Counting algorithm")
@@ -22,7 +27,7 @@ def make_parser():
         "-d", "--device",
         type=str,
         default="MYRIAD",
-        help="CPU or MYRAID(ncs2)"
+        help="CPU or MYRIAD (ncs2)"
     )
     parser.add_argument(
         "-m", "--model_path",
@@ -34,13 +39,19 @@ def make_parser():
         "-v","--video_path",
         type=str,
         default='0',
-        help="비디오를 입력으로 넣고싶은 경우 경로를 입력해 주세요, 입력안하면 카메라 정보가 입력으로 들어갑니다."
+        help="비디오를 입력으로 넣고싶은 경우 경로를 입력해 주세요, 입력값이 없으면 카메라 정보가 입력으로 들어갑니다."
     )
     parser.add_argument(
         "-o", "--output_path",
         type=str,
         default=None,
         help="저장을 원하면 경로를 입력해주세요"
+    )
+    parser.add_argument(
+        "--video_sampling",
+        type=int,
+        default= 1,
+        help="비디오에서 프레임을 몇단위로 샘플링 할 것인지를 뜻합니다. 30프레임 -> 10프레임 으로 할경우 30 // 10 = 3을 입력해야 합니다."
     )
 
     #detection args
@@ -127,6 +138,7 @@ def main(args):
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     if saving_path != None:
         out = cv2.VideoWriter(saving_path, cv2.VideoWriter_fourcc(*'DIVX'), 30, (width, height))
+    video_sampling = args.video_sampling
     
     #NCS2 setting
     ie = IECore()
@@ -143,7 +155,8 @@ def main(args):
     
     while True:
         #read image from camera
-        ret_val, frame = cap.read()
+        for i in range(video_sampling):
+            ret_val, frame = cap.read()
         if ret_val == False:
             break
     
@@ -175,7 +188,8 @@ def main(args):
 
         #update fps
         end = time()
-        fps = 1/(end - start)
+        if args.video_path == '0':
+            fps = 1/(end - start)
         start = time()
     
         #Update the tracklets

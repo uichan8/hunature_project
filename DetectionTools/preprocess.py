@@ -28,7 +28,7 @@ def preprocess(img, input_size, yolo_v5 = False):
         padded_img /= 255
         padded_img = padded_img.transpose(swap)
 
-    else:
+    else: #yolox
         padded_img = Normalize(image=padded_img)['image'].transpose(swap)
 
 
