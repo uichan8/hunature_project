@@ -18,7 +18,7 @@ from Utils.visualize import visualize, plot_tracking
 # $ python3 object_tracking.py -i 320 -m 'DetectionModels/yolov5s_320/yolov5s_320'
 #
 # from video
-# $ python3 object_tracking.py -i 640 -m 'DetectionModels/yolov5s_640/yolov5s_640' -v "station.mpg" -o "result/station.mpg" --video_sampling "1" --fps "30"
+# $ python3 object_tracking.py -i 320 -m 'DetectionModels/yolov5s_320/yolov5s_320' -v "roadview.mpg" --video_sampling "3" --fps "10"
 
 def make_parser():
     parser = argparse.ArgumentParser("Counting algorithm")
