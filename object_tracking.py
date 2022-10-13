@@ -13,7 +13,7 @@ from TrackingTools.byte_tracker import BYTETracker
 
 from Utils.visualize import visualize, plot_tracking
 
-#python3 object_tracking.py -i 224 -m 'DetectionModels/yolov5n_224/yolov5n_224'
+#python3 object_tracking.py -i 360 -m 'DetectionModels/yolov5n_320/yolov5n_320' -v 'station.mpg -o 'result'
 
 def make_parser():
     parser = argparse.ArgumentParser("Counting algorithm")
