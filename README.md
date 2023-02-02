@@ -5,6 +5,8 @@
 
 Raspberry Pi 4 Model B (RPi4B) 와 Intel Neural Compute Stick 2 (NCS2) 상에서 real-time으로 구동합니다. 
 
+[notion 정리](https://sphenoid-gastonia-579.notion.site/3458e886835144d4af92fe4ac4d0eaf7)
+
 ## YOLO X
 
 - **YOLOX는 기본적으로 1 Stage Detector로 Input - Backbone - Neck - Dense Prediction의 구조를 가진다.**
